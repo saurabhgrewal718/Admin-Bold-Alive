@@ -1,9 +1,10 @@
 import 'package:AdminBoldAlive/models/Product.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 
-class ProductTitleWithImage extends StatelessWidget {
+class ProductTitleWithImage extends StatefulWidget {
   const ProductTitleWithImage({
     Key key,
     @required this.product,
@@ -12,8 +13,108 @@ class ProductTitleWithImage extends StatelessWidget {
   final Products product;
 
   @override
+  _ProductTitleWithImageState createState() => _ProductTitleWithImageState();
+}
+
+class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
+
+  Widget yesButton(){
+    return Container(
+        padding: EdgeInsets.only(top: 3, left: 3),
+        width: MediaQuery.of(context).size.width*0.23,
+        margin: EdgeInsets.only(left:20,right:20,bottom:20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          border: Border(
+            bottom: BorderSide(color: Colors.green),
+            top: BorderSide(color: Colors.green),
+            left: BorderSide(color: Colors.green),
+            right: BorderSide(color: Colors.green),
+          )
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text('Yes',textAlign: TextAlign.center, style: TextStyle(
+              fontWeight: FontWeight.w900, 
+              fontSize: 18,
+              color: Colors.black
+            ),),
+        ),
+      );
+  }
+
+  void _showAlert(BuildContext context,String value){
+    HapticFeedback.vibrate();
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20.0))
+        ),
+        title:Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Text('Do you want to logout?',textAlign: TextAlign.center, style: TextStyle(
+            fontWeight: FontWeight.w900, 
+            fontSize: 18,
+            color: Colors.black
+          ),),
+        ),
+        content: Container(height: 1,color: Colors.black12,),
+        actions: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              value == 'hide' ? 
+              FlatButton(
+                onPressed: (){
+                  print('doing Hide');
+                }, 
+                child: yesButton()
+              ): FlatButton(
+                onPressed: (){
+                  print('doing Delete');
+                }, 
+                child: yesButton()
+              ),
+              FlatButton(
+                onPressed: (){
+                  Navigator.of(ctx).pop();
+                }, 
+                child: Container(
+                  padding: EdgeInsets.only(top: 3, left: 3),
+                  width: MediaQuery.of(context).size.width*0.23,
+                  margin: EdgeInsets.only(left:20,right:20,bottom:20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.redAccent),
+                      top: BorderSide(color: Colors.redAccent),
+                      left: BorderSide(color: Colors.redAccent),
+                      right: BorderSide(color: Colors.redAccent),
+                    )
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text('No',textAlign: TextAlign.center, style: TextStyle(
+                        fontWeight: FontWeight.w900, 
+                        fontSize: 18,
+                        color: Colors.black
+                      ),),
+                  ),
+                )
+              )
+            ],
+          )
+        ],
+      )
+    );
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    List<dynamic> images = product.imgDetail;
+    List<dynamic> images = widget.product.imgDetail;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
@@ -22,11 +123,11 @@ class ProductTitleWithImage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Catagory : ${product.catagory}",
+              "Catagory : ${widget.product.catagory}",
               style: TextStyle(color: Colors.black),
             ),
             Text(
-              "${product.title}",
+              "${widget.product.title}",
               style: Theme.of(context)
                   .textTheme
                   .headline4
@@ -34,7 +135,7 @@ class ProductTitleWithImage extends StatelessWidget {
             ),
             SizedBox(height: 30,),
             Text(
-              "Description : ${product.description}",
+              "Description : ${widget.product.description}",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
@@ -42,7 +143,7 @@ class ProductTitleWithImage extends StatelessWidget {
               ),
             ),
             Text(
-              "Product Id : ${product.id}",
+              "Product Id : ${widget.product.id}",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
@@ -58,7 +159,7 @@ class ProductTitleWithImage extends StatelessWidget {
                     children: [
                       TextSpan(text: "Price\n",style: TextStyle(color: Colors.black)),
                       TextSpan(
-                        text: "\₹ ${product.price}",
+                        text: "\₹ ${widget.product.price}",
                         style: Theme.of(context).textTheme.headline4.copyWith(
                             color: Colors.black, fontWeight: FontWeight.bold),
                       ),
@@ -71,9 +172,9 @@ class ProductTitleWithImage extends StatelessWidget {
                   height: 150,
                   width: 150,
                   child: Hero(
-                    tag: "Product Id : ${product.id}",
+                    tag: "Product Id : ${widget.product.id}",
                     child: Image.network(
-                      product.image,
+                      widget.product.image,
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -121,6 +222,74 @@ class ProductTitleWithImage extends StatelessWidget {
 
               : 
                 Text('No Description images found '),
+            ),
+            Center(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width*0.4,
+                    padding: EdgeInsets.only(top: 3, left: 3),
+                    margin: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border(
+                        bottom: BorderSide(color: Colors.black),
+                        top: BorderSide(color: Colors.black),
+                        left: BorderSide(color: Colors.black),
+                        right: BorderSide(color: Colors.black),
+                      )
+                    ),
+                    child: MaterialButton(
+                      minWidth: double.infinity,
+                      height: 50,
+                      onPressed: (){
+                        _showAlert(context,'hide');
+                      },
+                      color: Colors.blue[200],
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)
+                      ),
+                      child: Text('Hide Product', style: TextStyle(
+                        fontWeight: FontWeight.w600, 
+                        fontSize: 18,
+                        color: Colors.black
+                      ),),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width*0.4,
+                    padding: EdgeInsets.only(top: 3, left: 3),
+                    margin: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border(
+                        bottom: BorderSide(color: Colors.black),
+                        top: BorderSide(color: Colors.black),
+                        left: BorderSide(color: Colors.black),
+                        right: BorderSide(color: Colors.black),
+                      )
+                    ),
+                    child: MaterialButton(
+                      minWidth: double.infinity,
+                      height: 50,
+                      onPressed: (){
+                        _showAlert(context,'delete');
+                      },
+                      color: Colors.red[200],
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)
+                      ),
+                      child: Text('Delete Product', style: TextStyle(
+                        fontWeight: FontWeight.w600, 
+                        fontSize: 18,
+                        color: Colors.black
+                      ),),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

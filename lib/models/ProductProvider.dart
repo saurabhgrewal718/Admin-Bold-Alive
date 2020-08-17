@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import './Product.dart';
 
 class ProductModel with ChangeNotifier{
@@ -74,4 +76,40 @@ Future<void> fetchCatagories(String catagory) async {
     throw (error);
   }
 }
+
+Future<void> deleteProduct(String myId)async{
+    try{
+      String urlString = '';
+      final prefs = await SharedPreferences.getInstance();
+      final userIdentity = prefs.getString('userId')?? int.parse('0');
+
+      if( userIdentity != null || userIdentity != 0){
+          urlString = userIdentity;
+          print('used from shared preferences');  
+      }else{
+        final userData = await FirebaseAuth.instance.currentUser();
+        urlString = userData.uid;
+      }
+
+      await Firestore.instance
+      .collection('users/$urlString/mypings')
+      .getDocuments()
+      .then((querysnapshot) {
+        querysnapshot.documents.forEach((element) async{
+          if(element.data['pid'] == myId){
+            await Firestore.instance
+              .collection('users/$urlString/mypings').document(element.data['documentId']).delete();
+          }
+        });
+      });
+      notifyListeners();
+
+    }catch(err){
+      print('deletion failed');
+      notifyListeners();
+    }
+  }
+
+
+
 }
