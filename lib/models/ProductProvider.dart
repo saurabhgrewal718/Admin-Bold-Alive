@@ -24,7 +24,8 @@ Future<void> fetchAndSetProducts() async {
           description: result.data['description'],
           image: result.data['image'],
           id:result.data['id'],
-          catagory: result.data['catagory']
+          catagory: result.data['catagory'],
+          imgDetail: result.data['imgDetail']
         )
       );
  
@@ -57,7 +58,8 @@ Future<void> fetchCatagories(String catagory) async {
           description: result.data['description'],
           image: result.data['image'],
           id:result.data['id'],
-          catagory: result.data['catagory']
+          catagory: result.data['catagory'],
+          imgDetail: result.data['imgDetail']
         )
       );
  

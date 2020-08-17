@@ -1,5 +1,6 @@
 class Products {
   final String image, title, description,id,catagory;
+  final List<dynamic> imgDetail;
   final int price;
   Products({
     this.image,
@@ -7,6 +8,7 @@ class Products {
     this.price,
     this.description,
     this.id,
+    this.imgDetail,
     this.catagory
   });
 }

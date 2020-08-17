@@ -19,7 +19,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     return Scaffold(
       // each product have a color
-      backgroundColor: Color(0xFFAEAEAE),
+      backgroundColor: Colors.grey[200],
       appBar: buildAppBar(context,count),
       body: Body(product: widget.product),
     );
@@ -27,7 +27,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   AppBar buildAppBar(BuildContext context,int count) {
     return AppBar(
-      backgroundColor: Color(0xFFAEAEAE),
+      backgroundColor: Colors.grey[200],
       elevation: 0,
       leading: IconButton(
         icon: Icon(

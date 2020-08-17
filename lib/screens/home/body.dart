@@ -10,10 +10,9 @@ class Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // It provide us total height and width
-    Size size = MediaQuery.of(context).size;
     return Container(
       height: MediaQuery.of(context).size.height,
-      child: ProductTitleWithImage(product: product)
+      child: SingleChildScrollView(child: ProductTitleWithImage(product: product))
     );
   }
 }

@@ -35,27 +35,30 @@ class _ProductsState extends State<Products> {
   Widget build(BuildContext context) {
     final profiles = Provider.of<ProductModel>(context);
     final profile = profiles.items;
-    return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: GridView.builder(
-              itemCount: profile.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 0.75,
-              ),
-              itemBuilder: (context, index) => ItemCard(
-                product: profile[index],
-                press: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailsScreen(
-                        product: profile[index],
-                      ),
-                    )),
-              )),
-           
-          );
+    return RefreshIndicator(
+          onRefresh: onrefresh,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: GridView.builder(
+                itemCount: profile.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 0.75,
+                ),
+                itemBuilder: (context, index) => ItemCard(
+                  product: profile[index],
+                  press: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailsScreen(
+                          product: profile[index],
+                        ),
+                      )),
+                )),
+             
+            ),
+    );
   }
 }
