@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "737152990750",
+    "firebase_url": "https://bold-alive-d1aeb.firebaseio.com",
+    "project_id": "bold-alive-d1aeb",
+    "storage_bucket": "bold-alive-d1aeb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737152990750:android:2eb20d78b2998facbab80f",
+        "android_client_info": {
+          "package_name": "com.example.BoldAlive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "737152990750-t2dqsr5acju6emafj2evq7g6c7e35ukq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc7aI_CzcOARDj9dYgdszjTC60JCvJnb4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "737152990750-t2dqsr5acju6emafj2evq7g6c7e35ukq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
