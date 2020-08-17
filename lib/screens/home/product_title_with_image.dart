@@ -18,7 +18,7 @@ class ProductTitleWithImage extends StatefulWidget {
 
 class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
 
-  Widget yesButton(){
+  Widget choiceButton(String value){
     return Container(
         padding: EdgeInsets.only(top: 3, left: 3),
         width: MediaQuery.of(context).size.width*0.23,
@@ -34,7 +34,7 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Text('Yes',textAlign: TextAlign.center, style: TextStyle(
+          child: Text(value,textAlign: TextAlign.center, style: TextStyle(
               fontWeight: FontWeight.w900, 
               fontSize: 18,
               color: Colors.black
@@ -70,39 +70,18 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
                 onPressed: (){
                   print('doing Hide');
                 }, 
-                child: yesButton()
+                child: choiceButton('Yes')
               ): FlatButton(
                 onPressed: (){
                   print('doing Delete');
                 }, 
-                child: yesButton()
+                child: choiceButton('Yes')
               ),
               FlatButton(
                 onPressed: (){
                   Navigator.of(ctx).pop();
                 }, 
-                child: Container(
-                  padding: EdgeInsets.only(top: 3, left: 3),
-                  width: MediaQuery.of(context).size.width*0.23,
-                  margin: EdgeInsets.only(left:20,right:20,bottom:20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border(
-                      bottom: BorderSide(color: Colors.redAccent),
-                      top: BorderSide(color: Colors.redAccent),
-                      left: BorderSide(color: Colors.redAccent),
-                      right: BorderSide(color: Colors.redAccent),
-                    )
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text('No',textAlign: TextAlign.center, style: TextStyle(
-                        fontWeight: FontWeight.w900, 
-                        fontSize: 18,
-                        color: Colors.black
-                      ),),
-                  ),
-                )
+                child: choiceButton('No')
               )
             ],
           )
