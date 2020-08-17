@@ -20,23 +20,26 @@ class ProductTitleWithImage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "${product.catagory}",
+              "Catagory : ${product.catagory}",
               style: TextStyle(color: Colors.white),
             ),
             Text(
-              product.title,
+              "${product.title}",
               style: Theme.of(context)
                   .textTheme
                   .headline4
                   .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 30,),
             Text(
-              product.description,
-              style: Theme.of(context)
-                  .textTheme
-                  .headline4
-                  .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+              "Description : ${product.description}",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Colors.white
+              ),
             ),
+            SizedBox(height: 30,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -58,7 +61,7 @@ class ProductTitleWithImage extends StatelessWidget {
                   height: 150,
                   width: 150,
                   child: Hero(
-                    tag: "${product.id}",
+                    tag: "Product Id : ${product.id}",
                     child: Image.network(
                       product.image,
                       fit: BoxFit.fill,
