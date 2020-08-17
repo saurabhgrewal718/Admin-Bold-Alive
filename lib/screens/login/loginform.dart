@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import './notauth.dart';
 
 class LoginForm extends StatefulWidget {
   @override
@@ -27,11 +28,20 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
+  void _signout(BuildContext ctx) async {
+    await FirebaseAuth.instance.signOut();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    print('signed out');
+    
+  }
   
-  void _saveForm() async{
+
+  
+  void _saveForm(BuildContext ctx) async{
         
     final isValid = _form.currentState.validate();
-    FocusScope.of(context).unfocus();
+    FocusScope.of(ctx).unfocus();
     if(isValid){
       setState(() {
       _isLoading= true;
@@ -45,36 +55,16 @@ class _LoginFormState extends State<LoginForm> {
         final prefs = await SharedPreferences.getInstance();
         prefs.setString('userId', authResult.user.uid);
         
-        if(authResult!=null ){
-          Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-           
+        if(authResult!=null && (authResult.user.uid == "WD3L8j0rmqYzmYb64HYLcLnSFJI2" || authResult.user.uid == "qp437mGL08M3vWYfCkjCSjgGGw32")){
+          Navigator.of(ctx).pushReplacementNamed(HomeScreen.routeName);
+        }else{
+          _signout(ctx);
+          Navigator.of(ctx).pushReplacementNamed(NotAuth.routeName);
         }
 
-        // final document = Firestore.instance.collection('users/${authResult.user.uid}/personal').document('${authResult.user.uid}');
-        // final documentlist = await document.get();
-        
-        // final prefs = await SharedPreferences.getInstance();
-        // prefs.setString('userId', authResult.user.uid);
-        
-        // print('name is');
-        // print(documentlist['name']);
-        // print(prefs.getString('name'));
-        // prefs.setString('name', documentlist['name']);
-        // prefs.setString('age', documentlist['age']);
-        // prefs.setString('userProfilePicture', documentlist['profile_picture']);
-        // prefs.setString('gender', documentlist['gender']);
-        // prefs.setString('course', documentlist['course']);
-        // prefs.setString('bio', documentlist['bio']);
-        // prefs.setString('can', documentlist['can']);
-        // prefs.setString('things', documentlist['things']);
-        // prefs.setString('who', documentlist['who']);
-        // prefs.setString('instagram', documentlist['instagram']);
-        // print('this is the AUTH');            
-        // print(authResult);
-
         setState(() {
-            _isLoading= false;
-          });
+          _isLoading= false;
+        });
         
         
       }on PlatformException catch(err){
@@ -83,7 +73,7 @@ class _LoginFormState extends State<LoginForm> {
         if(err.message != null){
           message= err.message;
         }
-        Scaffold.of(context).showSnackBar(SnackBar(
+        Scaffold.of(ctx).showSnackBar(SnackBar(
           backgroundColor: Colors.redAccent,
           content: Text(message ,
           style: GoogleFonts.openSans(
@@ -159,6 +149,7 @@ class _LoginFormState extends State<LoginForm> {
                             onSaved: (value){
                               _email=value;
                             },
+                            style: TextStyle(color: Colors.black),
                           ),
                           SizedBox(height: 30,),
                         ],
@@ -182,6 +173,7 @@ class _LoginFormState extends State<LoginForm> {
                               return null;
                             },
                             focusNode: _pass,
+                            style: TextStyle(color: Colors.black),
                             textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
@@ -219,7 +211,7 @@ class _LoginFormState extends State<LoginForm> {
                         minWidth: double.infinity,
                         height: 60,
                         onPressed: () {
-                            _saveForm();
+                            _saveForm(context);
                             
                         },
                         color: Colors.greenAccent,

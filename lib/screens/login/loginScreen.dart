@@ -1,4 +1,3 @@
-import 'package:AdminBoldAlive/screens/signup/signupscreen.dart';
 import 'package:flutter/material.dart';
 import './loginform.dart';
 import '../../Animation/FadeAnimation.dart';
@@ -34,6 +33,7 @@ class LoginScreen extends StatelessWidget {
               children: <Widget>[
                 FadeAnimation(1, Text("Login", style: TextStyle(
                   fontSize: 30,
+                  color: Colors.black,
                   fontWeight: FontWeight.bold
                 ),)),
                 SizedBox(height: 20,),
@@ -48,20 +48,7 @@ class LoginScreen extends StatelessWidget {
               child: FadeAnimation(1,LoginForm()),
             ),
             SizedBox(height: 30,),
-            FadeAnimation(1, Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text("Don't have an account?"),
-                  FlatButton(
-                        child: Text("Sign Up", style: TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 18
-                      ),),
-                        onPressed: (){
-                          Navigator.of(context).pushReplacementNamed(SignupScreen.routeName,); 
-                        }
-                      ),
-                ],
-              )),
+            
           ],
         ),
       ),
