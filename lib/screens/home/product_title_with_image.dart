@@ -93,11 +93,13 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
 
   @override
   Widget build(BuildContext context) {
+    int containerheight = 200;
     List<dynamic> images = widget.product.imgDetail;
+    widget.product.description.length > 300 ? containerheight = 500 : containerheight = 300;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        height: MediaQuery.of(context).size.height+500,
+        height: MediaQuery.of(context).size.height+containerheight,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -112,15 +114,22 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
                   .headline4
                   .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 30,),
-            Text(
-              "Description : ${widget.product.description}",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.black
+            SizedBox(height: 10,),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              padding: EdgeInsets.all(10),
+              child: Text(
+                "Description : ${widget.product.description}",
+                maxLines: 10,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.black
+                ),
               ),
             ),
+            SizedBox(height:30),
             Text(
               "Product Id : ${widget.product.id}",
               style: TextStyle(
