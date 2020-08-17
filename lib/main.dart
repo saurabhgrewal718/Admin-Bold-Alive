@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -33,11 +34,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-     
-      _counter++;
+  void _incrementCounter() async{
+    await Firestore.instance
+    .collection("products")
+    .getDocuments()
+    .then((querySnapshot) {
+    querySnapshot.documents.forEach((result) {
+      print(result.data);      
     });
+  });
   }
 
   @override
