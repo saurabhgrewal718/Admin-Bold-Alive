@@ -1,8 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:AdminBoldAlive/screens/home/products.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../welcome.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = './homescreen';
@@ -14,28 +11,46 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-              child: Center(
-                child: Text('this is best thing to do'),
-              ),
-            ),
-            FlatButton(
-              onPressed: () async{
-                await FirebaseAuth.instance.signOut();
-                final prefs = await SharedPreferences.getInstance();
-                prefs.clear();
-                final currentId = prefs.getString('userId');
-                if(currentId == null){
-                  Navigator.of(context).pushReplacementNamed(Welcome.routeName);
-                }
-              },
-              child: Text('Signout'),
-            )
-          ],
+      appBar: AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(
+            Icons.dashboard,
+            color: Colors.black45,
+          ),
+        onPressed: (){},
+      ),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(
+            Icons.search,
+            color: Colors.black45,
+          ),
+          onPressed: showMenu,
         ),
+        IconButton(
+          icon: Icon(
+            Icons.shopping_basket,
+            color: Colors.black45,
+          ),
+          onPressed: () {
+            // Navigator.of(context).pushNamed(CartScreen.routeName);
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.edit,
+            // By default our  icon color is white
+            color: Colors.black45,
+          ),
+          onPressed: (){
+            // Navigator.of(context).pushNamed(EditScreen.routeName);
+          },
+        ),
+        SizedBox(width: 20)
+      ],
+    ),
+      body: Products(),
     );
   }
 }
