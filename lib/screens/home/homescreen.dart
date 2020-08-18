@@ -1,5 +1,6 @@
 import 'package:AdminBoldAlive/screens/home/products.dart';
 import 'package:flutter/material.dart';
+import './addproduct.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = './homescreen';
@@ -40,11 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         IconButton(
           icon: Icon(Icons.edit,
-            // By default our  icon color is white
             color: Colors.black45,
           ),
           onPressed: (){
-            // Navigator.of(context).pushNamed(EditScreen.routeName);
+            Navigator.of(context).pushNamed(AddProduct.routeName);
           },
         ),
         SizedBox(width: 20)

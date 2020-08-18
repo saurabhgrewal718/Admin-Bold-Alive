@@ -20,9 +20,11 @@ Future<void> fetchAndSetProducts() async {
   .getDocuments()
   .then((querySnapshot) {
   querySnapshot.documents.forEach((result) {
+        String _myprice;
+        _myprice = result.data['price'].toString();
         loadedProducts.add(Products(
           title: result.data['title'],
-          price: result.data['price'],
+          price: int.parse(_myprice),
           description: result.data['description'],
           image: result.data['image'],
           id:result.data['id'],
@@ -77,6 +79,7 @@ Future<void> fetchCatagories(String catagory) async {
   }
 }
 
+//deleting product totally will be implemented after adding a new product
 Future<void> deleteProduct(String myId)async{
     try{
       String urlString = '';

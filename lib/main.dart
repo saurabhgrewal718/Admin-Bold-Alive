@@ -2,6 +2,7 @@ import 'package:AdminBoldAlive/models/ProductProvider.dart';
 import 'package:AdminBoldAlive/screens/home/products.dart';
 import 'package:AdminBoldAlive/screens/login/notauth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import './screens/home/addproduct.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,17 +26,19 @@ class MyApp extends StatelessWidget {
           ],
           child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
+          title: 'Admin BoldAlive',
+          
           theme: ThemeData(
-            textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.black),
-            visualDensity: VisualDensity.adaptivePlatformDensity,
+            primaryColor: Colors.black,
+            accentColor: Colors.grey
           ),
           home: LoginApp(),
           routes: {
             HomeScreen.routeName : (ctx) => HomeScreen(),
             Welcome.routeName : (ctx) => Welcome(),
             LoginScreen.routeName : (ctx) => LoginScreen(),
-            Products.routeName : (ctx) => Products()
+            Products.routeName : (ctx) => Products(),
+            AddProduct.routeName : (ctx) => AddProduct()
             // CartScreen.routeName : (ctx) => CartScreen(),
             // OrderPage.routeName : (ctx) => OrderPage(),
             // EditScreen.routeName :(ctx) => EditScreen(),
