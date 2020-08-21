@@ -6,6 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:multi_image_picker/multi_image_picker.dart';
+
+
 
 class AddProduct extends StatefulWidget {
   static const routeName = './addproduct';
@@ -14,6 +20,10 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
+  List<Asset> images = List<Asset>();
+  List<String> imageUrls = <String>[];
+  String _error = 'No Error Dectected';
+  bool isUploading = false;
 
  var _isLoading = false;
   final _pass = FocusNode();
@@ -21,15 +31,95 @@ class _AddProductState extends State<AddProduct> {
   final _form = GlobalKey<FormState>();
 
   String _catagory = '';
-  String _hide = '';
   String _title='';
   String _description = '';
   String _price;
   bool isLoading = false;
   double fileSize;
 
+  
   File _mainImage;
   final picker = ImagePicker();
+
+ Widget buildGridView() {
+    return GridView.count(
+      crossAxisCount: 3,
+      children: List.generate(images.length, (index) {
+        Asset asset = images[index];
+        return AssetThumb(
+          asset: asset,
+          width: 300,
+          height: 300,
+        );
+      }),
+    );
+  }
+
+  Future<void> loadAssets() async {
+    List<Asset> resultList = List<Asset>();
+    String error = 'No Error Dectected';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 300,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Example App",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+      _error = error;
+    });
+  }
+
+  void uploadImages(){
+    for ( var imageFile in images) {
+      postImage(imageFile).then((downloadUrl) {
+        imageUrls.add(downloadUrl.toString());
+        if(imageUrls.length==images.length){
+          String documnetID = DateTime.now().millisecondsSinceEpoch.toString();
+          Firestore.instance.collection('images').document(documnetID).setData({
+            'imgDetail':imageUrls
+          }).then((_){
+            print('upload sucessful');
+            setState(() {
+              images = [];
+              imageUrls = [];
+            });
+          });
+        }
+      }).catchError((err) {
+        print(err);
+      });
+    }
+
+  }
+  
+  Future<dynamic> postImage(Asset imageFile) async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
+    StorageUploadTask uploadTask = reference.putData((await imageFile.getByteData()).buffer.asUint8List());
+    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+    print(storageTaskSnapshot.ref.getDownloadURL());
+    return storageTaskSnapshot.ref.getDownloadURL();
+  }
+
 
   Future getImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -38,12 +128,13 @@ class _AddProductState extends State<AddProduct> {
       _mainImage = File(pickedFile.path);
     });
   }
-
+  
   @override
   void dispose() {
     _pass.dispose();
     super.dispose();
   }
+
  
   void _saveForm(BuildContext ctx) async{  
     final isValid = _form.currentState.validate();
@@ -63,8 +154,9 @@ class _AddProductState extends State<AddProduct> {
           ),
         ));
     }
-    
-    if(isValid){
+
+
+   if(isValid){
       _form.currentState.save();
       setState(() {
       _isLoading= true;
@@ -72,7 +164,6 @@ class _AddProductState extends State<AddProduct> {
     print(_title);
     print(_description);
     print(_catagory);
-    print(_hide);
     print(_price);
     
 
@@ -82,15 +173,26 @@ class _AddProductState extends State<AddProduct> {
       await ref.putFile(_mainImage).onComplete;
       final url = await ref.getDownloadURL();
 
-       await Firestore.instance.collection('products').add({
-              'title': _title,
-              'price': _price,
-              'image': url,
-              'id': DateTime.now().millisecondsSinceEpoch.toString(),
-              'hidden':_hide,
-              'catagory': _catagory,
-              'description': _description
-            });
+      final prefs = await SharedPreferences.getInstance();
+      prefs.getString('userId');
+
+      if(images.length==0){
+        print('no image selected');
+      }else{
+        print('we are uploading');
+        uploadImages();
+        print('upload finsihed');
+      }
+
+      await Firestore.instance.collection('products').document().setData({
+        'title': _title,
+        'price': _price,
+        'image': url,
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'hidden':false,
+        'catagory': _catagory,
+        'description': _description
+      });
 
       setState(() {
         _isLoading= false;
@@ -179,44 +281,6 @@ class _AddProductState extends State<AddProduct> {
                           ],
                         ),
                       ),
-                      SizedBox(height:30),
-                      Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: 5,),
-                          DropDownFormField(
-                                titleText: 'Hide Product',
-                                hintText: 'Please choose one',
-                                autovalidate: true,
-                                value: _hide,
-                                onSaved: (value) {
-                                  setState(() {
-                                    _hide = value;
-                                  });
-                                },
-                                onChanged: (value) {
-                                  setState(() {
-                                    _hide = value;
-                                  });
-                                },
-                                dataSource: [
-                                  {
-                                    "display": "true",
-                                    "value": "true",
-                                  },
-                                  {
-                                    "display": "false",
-                                    "value": "false",
-                                  },
-                                ],
-                                textField: 'display',
-                                valueField: 'value',
-                              ),
-                          SizedBox(height: 30,),
-                        ],
-                      ),
-                    ),
                       SizedBox(height:30),
                       Container(
                       child: Column(
@@ -357,12 +421,21 @@ class _AddProductState extends State<AddProduct> {
                             width: 200,
                             child: Center(
                             child: _mainImage == null
-                                ? Text('No image selected.')
+                                ? Text('No Title Image found')
                                 : Image.file(_mainImage),
                             ),
                           ),
                           FlatButton(onPressed: getImage, child: Icon(Icons.add_a_photo)),
                         ],
+                      ),
+                      Center(child: Text('Error: $_error')),
+                      RaisedButton(
+                        child: Text("Pick images"),
+                        onPressed: loadAssets,
+                      ),
+                      Container(
+                        height:300,
+                        child: buildGridView(),
                       ),
 
                       SizedBox(height:60),
