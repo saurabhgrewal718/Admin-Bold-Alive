@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:AdminBoldAlive/screens/home/homescreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
@@ -36,6 +38,7 @@ class _AddProductState extends State<AddProduct> {
   String _price;
   bool isLoading = false;
   double fileSize;
+  final String documnetID = DateTime.now().millisecondsSinceEpoch.toString();
 
   
   File _mainImage;
@@ -61,13 +64,13 @@ class _AddProductState extends State<AddProduct> {
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
+        maxImages: 4,
         enableCamera: true,
         selectedAssets: images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
           actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
+          actionBarTitle: "Upload Description Images",
           allViewTitle: "All Photos",
           useDetailsView: false,
           selectCircleStrokeColor: "#000000",
@@ -88,29 +91,6 @@ class _AddProductState extends State<AddProduct> {
     });
   }
 
-  void uploadImages(){
-    for ( var imageFile in images) {
-      postImage(imageFile).then((downloadUrl) {
-        imageUrls.add(downloadUrl.toString());
-        if(imageUrls.length==images.length){
-          String documnetID = DateTime.now().millisecondsSinceEpoch.toString();
-          Firestore.instance.collection('images').document(documnetID).setData({
-            'imgDetail':imageUrls
-          }).then((_){
-            print('upload sucessful');
-            setState(() {
-              images = [];
-              imageUrls = [];
-            });
-          });
-        }
-      }).catchError((err) {
-        print(err);
-      });
-    }
-
-  }
-  
   Future<dynamic> postImage(Asset imageFile) async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
@@ -120,9 +100,8 @@ class _AddProductState extends State<AddProduct> {
     return storageTaskSnapshot.ref.getDownloadURL();
   }
 
-
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.getImage(source: ImageSource.gallery,maxHeight: 800);
 
     setState(() {
       _mainImage = File(pickedFile.path);
@@ -141,8 +120,8 @@ class _AddProductState extends State<AddProduct> {
     FocusScope.of(ctx).unfocus();
 
      if(_mainImage == null){
-      Scaffold.of(context).hideCurrentSnackBar();
-      Scaffold.of(context).showSnackBar(SnackBar(
+      Scaffold.of(ctx).hideCurrentSnackBar();
+      Scaffold.of(ctx).showSnackBar(SnackBar(
           backgroundColor: Colors.redAccent,
           duration: Duration(seconds: 1),
           content: Text('Please select Product image',textAlign: TextAlign.center,
@@ -165,65 +144,112 @@ class _AddProductState extends State<AddProduct> {
     print(_description);
     print(_catagory);
     print(_price);
-    
 
-    try{        
-      
-      final ref = FirebaseStorage.instance.ref().child('product_images/$_title').child('$_title.jpg');
-      await ref.putFile(_mainImage).onComplete;
-      final url = await ref.getDownloadURL();
+    void uploadImages(){
+    for ( var imageFile in images) {
+      postImage(imageFile).then((downloadUrl) {
+        imageUrls.add(downloadUrl.toString());
+        if(imageUrls.length==images.length){ 
+          Firestore.instance.collection('products').document(documnetID).updateData({
+            'imgDetail':imageUrls
+          }).then((_){
+            Fluttertoast.showToast(
+              msg: "Description Images Upload Sucessful",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.greenAccent,
+              textColor: Colors.black,
+              fontSize: 16.0
+            );
+            
+            setState(() {
+              images = [];
+              imageUrls = [];
+              _isLoading= false;
 
-      final prefs = await SharedPreferences.getInstance();
-      prefs.getString('userId');
-
-      if(images.length==0){
-        print('no image selected');
-      }else{
-        print('we are uploading');
-        uploadImages();
-        print('upload finsihed');
-      }
-
-      await Firestore.instance.collection('products').document().setData({
-        'title': _title,
-        'price': _price,
-        'image': url,
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-        'hidden':false,
-        'catagory': _catagory,
-        'description': _description
+            });
+            Navigator.of(ctx).pushReplacementNamed(HomeScreen.routeName);
+            
+          });
+        }
+      }).catchError((err) {
+        print(err);
       });
-
-      setState(() {
-        _isLoading= false;
-      }); 
-
-    }on PlatformException catch(err){
-      var message= "An error occured ! PLease check Your Credentials";
-      if(err.message != null){
-        message= err.message;
-      }
-      Scaffold.of(ctx).showSnackBar(SnackBar(
-        backgroundColor: Colors.redAccent,
-        content: Text(message ,
-        style: GoogleFonts.openSans(
-          textStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w600)),
-        ),
-      ));
-
-      setState(() {
-        _isLoading= false;
-      });
-
-    }catch(err){
-      print(err);
-
     }
-   }
   }
+ 
+try{        
+  final ref = FirebaseStorage.instance.ref().child('product_images/$_title').child('$_title.jpg');
+  await ref.putFile(_mainImage).onComplete;
+  final url = await ref.getDownloadURL();
+
+  final prefs = await SharedPreferences.getInstance();
+  prefs.getString('userId');
+
+  if(images.length==0){
+    print('no image selected');
+  }else{
+      uploadImages();
+      Fluttertoast.showToast(
+        msg: "Uploading Description images",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.orange,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
+  await Firestore.instance.collection('products').document(documnetID).setData({
+    'title': _title,
+    'price': _price,
+    'image': url,
+    'id': documnetID,
+    'hidden':false,
+    'catagory': _catagory,
+    'description': _description
+  });
+
+  Fluttertoast.showToast(
+        msg: "Title and text uploaded",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.greenAccent,
+        textColor: Colors.black,
+        fontSize: 16.0
+    );
+
+  
+
+  }on PlatformException catch(err){
+    var message= "An error occured ! PLease check Your Credentials";
+    if(err.message != null){
+      message= err.message;
+    }
+    Scaffold.of(ctx).showSnackBar(SnackBar(
+      backgroundColor: Colors.redAccent,
+      content: Text(message ,
+      style: GoogleFonts.openSans(
+        textStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+            fontWeight: FontWeight.w600)),
+      ),
+    ));
+
+    setState(() {
+      _isLoading= false;
+    });
+
+  }catch(err){
+    print(err);
+
+  }
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -242,6 +268,61 @@ class _AddProductState extends State<AddProduct> {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
+                      SizedBox(height:30),
+                      Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: 5,),
+                          DropDownFormField(
+                                titleText: 'Product Catagory',
+                                hintText: 'Please choose one',
+                                value: _catagory,
+                                autovalidate: true,
+                                onSaved: (value) {
+                                  setState(() {
+                                    _catagory = value;
+                                  });
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _catagory = value;
+                                  });
+                                },
+                                dataSource: [
+                                  {
+                                    "display": "Mugs",
+                                    "value": "Mugs",
+                                  },
+                                  {
+                                    "display": "Shirts",
+                                    "value": "Shirts",
+                                  },
+                                  {
+                                    "display": "Hoodie",
+                                    "value": "Hoodie",
+                                  },
+                                  {
+                                    "display": "Phone Cases",
+                                    "value": "Phone Cases",
+                                  },
+                                  {
+                                    "display": "Kitchen Items",
+                                    "value": "Kitchen Items",
+                                  },
+                                  {
+                                    "display": "Pillow",
+                                    "value": "Pillow",
+                                  },
+                                  
+                                ],
+                                textField: 'display',
+                                valueField: 'value',
+                              ),
+                          SizedBox(height: 30,),
+                        ],
+                      ),
+                    ),
                       SizedBox(height: 30,),
                       Container(
                         child: Column(
@@ -281,64 +362,7 @@ class _AddProductState extends State<AddProduct> {
                           ],
                         ),
                       ),
-                      SizedBox(height:30),
-                      Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: 5,),
-                          DropDownFormField(
-                                titleText: 'Product Catagory',
-                                hintText: 'Please choose one',
-                                value: _catagory,
-                                autovalidate: true,
-                                onSaved: (value) {
-                                  setState(() {
-                                    _catagory = value;
-                                  });
-                                },
-                                onChanged: (value) {
-                                  setState(() {
-                                    _catagory = value;
-                                  });
-                                },
-                                dataSource: [
-                                  {
-                                    "display": "Mugs",
-                                    "value": "Mugs",
-                                  },
-                                  {
-                                    "display": "Climbing",
-                                    "value": "Climbing",
-                                  },
-                                  {
-                                    "display": "Walking",
-                                    "value": "Walking",
-                                  },
-                                  {
-                                    "display": "Swimming",
-                                    "value": "Swimming",
-                                  },
-                                  {
-                                    "display": "Soccer Practice",
-                                    "value": "Soccer Practice",
-                                  },
-                                  {
-                                    "display": "Baseball Practice",
-                                    "value": "Baseball Practice",
-                                  },
-                                  {
-                                    "display": "Football Practice",
-                                    "value": "Football Practice",
-                                  },
-                                ],
-                                textField: 'display',
-                                valueField: 'value',
-                              ),
-                          SizedBox(height: 30,),
-                        ],
-                      ),
-                    ),
+                      
                     SizedBox(height:30),
                       Container(
                         child: Column(

@@ -33,7 +33,7 @@ Future<void> fetchAndSetProducts() async {
         )
       );
  
-    print(result.data);
+    print('datafetched');
     _profile = loadedProducts;
       
     notifyListeners();
