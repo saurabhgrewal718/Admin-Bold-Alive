@@ -29,26 +29,29 @@ class ItemCard extends StatelessWidget {
                 color: Colors.white38,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Hero(
-                tag: "${product.title}",
-                child: 
-                  Image.network(product.image,fit: BoxFit.cover,
-                    loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
-                    if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                        backgroundColor: Colors.greenAccent,
-                        value: loadingProgress.expectedTotalBytes != null ? 
-                              loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
-                              : null,
-                        ),
-                      );
-                    },
-                  ),
+              child: Container(
+                color: Colors.grey[200],
+                child: Hero(
+                  tag: "${product.title}",
+                  child: 
+                    Image.network(product.image,fit: BoxFit.cover,
+                      loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                      if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                          backgroundColor: Colors.greenAccent,
+                          value: loadingProgress.expectedTotalBytes != null ? 
+                                loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+                ),
               ),
             ),
           ),
-          Padding(
+          product.hidden == true ? Container(color: Colors.orangeAccent, child: Text('Product is hidden for cutomer')) : Padding(
             padding: const EdgeInsets.symmetric(vertical: 20 / 4),
             child: Text(
               // products is out demo list

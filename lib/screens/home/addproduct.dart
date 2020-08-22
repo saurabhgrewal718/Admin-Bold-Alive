@@ -101,7 +101,7 @@ class _AddProductState extends State<AddProduct> {
   }
 
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery,maxHeight: 800);
+    final pickedFile = await picker.getImage(source: ImageSource.gallery,maxHeight: 800,maxWidth: 800);
 
     setState(() {
       _mainImage = File(pickedFile.path);

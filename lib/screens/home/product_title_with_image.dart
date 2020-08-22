@@ -1,7 +1,10 @@
 import 'package:AdminBoldAlive/models/Product.dart';
+import 'package:AdminBoldAlive/screens/home/homescreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 class ProductTitleWithImage extends StatefulWidget {
@@ -17,6 +20,7 @@ class ProductTitleWithImage extends StatefulWidget {
 }
 
 class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
+  bool isloading = false;
 
   Widget choiceButton(String value){
     return Container(
@@ -43,7 +47,99 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
       );
   }
 
-  void _showAlert(BuildContext context,String value){
+  void hideproduct(BuildContext context)async{
+    HapticFeedback.vibrate();
+    setState(() {
+      isloading = true;
+    });
+    try{
+      await Firestore.instance
+        .collection('products')
+        .getDocuments()
+        .then((querysnapshot) {
+        querysnapshot.documents.forEach((element) async{
+          if(element.data['id'] == widget.product.id){
+            await Firestore.instance
+              .collection('products').document(widget.product.id).updateData({
+                'hidden':true
+              });
+          }
+        });
+      });
+      setState(() {
+        isloading = false;
+      });
+      Fluttertoast.showToast(
+        msg: "Product sucessfully Hidden",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.blueAccent,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+      Navigator.of(context).pop();
+    }catch(err){
+      setState(() {
+        isloading = false;
+      });
+      Fluttertoast.showToast(
+        msg: "$err",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.orangeAccent,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+    }
+  }
+
+void deleteproduct(BuildContext context)async{
+  HapticFeedback.vibrate();
+  try{
+    setState(() {
+      isloading = false;
+    });
+    await Firestore.instance
+      .collection('products')
+      .getDocuments()
+      .then((querysnapshot) {
+      querysnapshot.documents.forEach((element) async{
+        if(element.data['id'] == widget.product.id){
+          await Firestore.instance
+            .collection('products').document(widget.product.id).delete();
+        }
+      });
+    });
+    Fluttertoast.showToast(
+      msg: "Product sucessfully Deleted",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.redAccent,
+      textColor: Colors.white,
+      fontSize: 16.0
+    );
+    Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+
+  }catch(err){
+    setState(() {
+      isloading = false;
+    });
+    Fluttertoast.showToast(
+      msg: "$err",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.orangeAccent,
+      textColor: Colors.white,
+      fontSize: 16.0
+    );
+  }
+}
+
+  void _showAlert(BuildContext context,String value,String action){
     HapticFeedback.vibrate();
     showDialog(
       context: context,
@@ -54,7 +150,7 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
         ),
         title:Padding(
           padding: const EdgeInsets.all(15.0),
-          child: Text('Do you want to logout?',textAlign: TextAlign.center, style: TextStyle(
+          child: Text('$action this Product?',textAlign: TextAlign.center, style: TextStyle(
             fontWeight: FontWeight.w900, 
             fontSize: 18,
             color: Colors.black
@@ -68,14 +164,14 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
               value == 'hide' ? 
               FlatButton(
                 onPressed: (){
-                  print('doing Hide');
+                  hideproduct(context);
                 }, 
                 child: choiceButton('Yes')
-              ): FlatButton(
+              ):FlatButton(
                 onPressed: (){
-                  print('doing Delete');
+                  deleteproduct(context);
                 }, 
-                child: choiceButton('Yes')
+                child:choiceButton('Yes')
               ),
               FlatButton(
                 onPressed: (){
@@ -214,7 +310,8 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
             Center(
               child: Column(
                 children: <Widget>[
-                  Container(
+                  widget.product.hidden == false ?
+                  isloading == true ? Container(child:CircularProgressIndicator(backgroundColor: Colors.greenAccent,)):Container(
                     width: MediaQuery.of(context).size.width*0.4,
                     padding: EdgeInsets.only(top: 3, left: 3),
                     margin: EdgeInsets.all(16),
@@ -231,7 +328,7 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
                       minWidth: double.infinity,
                       height: 50,
                       onPressed: (){
-                        _showAlert(context,'hide');
+                        _showAlert(context,'hide','Hide');
                       },
                       color: Colors.blue[200],
                       elevation: 0,
@@ -244,8 +341,8 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
                         color: Colors.black
                       ),),
                     ),
-                  ),
-                  Container(
+                  ) : Container(child:Center(child:Text('Product Already hidden'))),
+                  isloading == true ? Container(child:CircularProgressIndicator(backgroundColor: Colors.greenAccent,)) : Container(
                     width: MediaQuery.of(context).size.width*0.4,
                     padding: EdgeInsets.only(top: 3, left: 3),
                     margin: EdgeInsets.all(16),
@@ -262,7 +359,7 @@ class _ProductTitleWithImageState extends State<ProductTitleWithImage> {
                       minWidth: double.infinity,
                       height: 50,
                       onPressed: (){
-                        _showAlert(context,'delete');
+                        _showAlert(context,'delete','Delete');
                       },
                       color: Colors.red[200],
                       elevation: 0,
