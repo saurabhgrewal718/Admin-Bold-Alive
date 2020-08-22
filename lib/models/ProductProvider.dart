@@ -119,38 +119,38 @@ try {
 }
 
 //deleting product totally will be implemented after adding a new product
-Future<void> deleteProduct(String myId)async{
-    try{
-      String urlString = '';
-      final prefs = await SharedPreferences.getInstance();
-      final userIdentity = prefs.getString('userId')?? int.parse('0');
+// Future<void> deleteProduct(String myId)async{
+//     try{
+//       String urlString = '';
+//       final prefs = await SharedPreferences.getInstance();
+//       final userIdentity = prefs.getString('userId')?? int.parse('0');
 
-      if( userIdentity != null || userIdentity != 0){
-          urlString = userIdentity;
-          print('used from shared preferences');  
-      }else{
-        final userData = await FirebaseAuth.instance.currentUser();
-        urlString = userData.uid;
-      }
+//       if( userIdentity != null || userIdentity != 0){
+//           urlString = userIdentity;
+//           print('used from shared preferences');  
+//       }else{
+//         final userData = await FirebaseAuth.instance.currentUser();
+//         urlString = userData.uid;
+//       }
 
-      await Firestore.instance
-      .collection('users/$urlString/mypings')
-      .getDocuments()
-      .then((querysnapshot) {
-        querysnapshot.documents.forEach((element) async{
-          if(element.data['pid'] == myId){
-            await Firestore.instance
-              .collection('users/$urlString/mypings').document(element.data['documentId']).delete();
-          }
-        });
-      });
-      notifyListeners();
+//       await Firestore.instance
+//       .collection('users/$urlString/mypings')
+//       .getDocuments()
+//       .then((querysnapshot) {
+//         querysnapshot.documents.forEach((element) async{
+//           if(element.data['pid'] == myId){
+//             await Firestore.instance
+//               .collection('users/$urlString/mypings').document(element.data['documentId']).delete();
+//           }
+//         });
+//       });
+//       notifyListeners();
 
-    }catch(err){
-      print('deletion failed');
-      notifyListeners();
-    }
-  }
+//     }catch(err){
+//       print('deletion failed');
+//       notifyListeners();
+//     }
+//   }
 
 
 

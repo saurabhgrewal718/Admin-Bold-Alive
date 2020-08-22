@@ -310,10 +310,10 @@ try{
                                     "display": "Kitchen Items",
                                     "value": "Kitchen Items",
                                   },
-                                  {
-                                    "display": "Pillow",
-                                    "value": "Pillow",
-                                  },
+                                  // {
+                                  //   "display": "Pillow",
+                                  //   "value": "Pillow",
+                                  // },
                                   
                                 ],
                                 textField: 'display',
