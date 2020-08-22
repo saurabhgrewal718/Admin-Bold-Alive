@@ -1,3 +1,4 @@
+import 'package:AdminBoldAlive/screens/hidden/hidden.dart';
 import 'package:AdminBoldAlive/screens/home/products.dart';
 import 'package:flutter/material.dart';
 import './addproduct.dart';
@@ -20,7 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Icons.dashboard,
             color: Colors.black45,
           ),
-        onPressed: (){},
+        onPressed: (){
+          Navigator.of(context).pushNamed(Hidden.routeName);
+        },
       ),
       actions: <Widget>[
         IconButton(

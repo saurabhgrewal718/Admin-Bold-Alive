@@ -57,9 +57,11 @@ Future<void> fetchCatagories(String catagory) async {
   .getDocuments()
   .then((querySnapshot) {
   querySnapshot.documents.forEach((result) {
+        String _myprice;
+        _myprice = result.data['price'].toString();
         loadedProducts.add(Products(
           title: result.data['title'],
-          price: result.data['price'],
+          price: int.parse(_myprice),
           description: result.data['description'],
           image: result.data['image'],
           id:result.data['id'],
@@ -71,6 +73,41 @@ Future<void> fetchCatagories(String catagory) async {
  
     print(result.data);
     _profile = loadedProducts;
+      
+    notifyListeners();
+  });
+});
+     
+  } catch (error) {
+    throw (error);
+  }
+}
+
+Future<void> fetchHidden() async {
+try { 
+  final List<Products> hiddenProducts = [];
+  Firestore.instance
+  .collection("products")
+  .where("hidden", isEqualTo: true)
+  .getDocuments()
+  .then((querySnapshot) {
+  querySnapshot.documents.forEach((result) {
+    String _myprice;
+    _myprice = result.data['price'].toString();
+    hiddenProducts.add(Products(
+      title: result.data['title'],
+      price: int.parse(_myprice),
+      description: result.data['description'],
+      image: result.data['image'],
+      id:result.data['id'],
+      catagory: result.data['catagory'],
+      imgDetail: result.data['imgDetail'],
+      hidden: result.data['hidden']
+    )
+  );
+ 
+    print(result.data);
+    _profile = hiddenProducts;
       
     notifyListeners();
   });

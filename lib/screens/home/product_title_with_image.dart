@@ -341,7 +341,12 @@ void deleteproduct(BuildContext context)async{
                         color: Colors.black
                       ),),
                     ),
-                  ) : Container(child:Center(child:Text('Product Already hidden'))),
+                  ) : Container(child:Center(child:Text('Product Already hidden',style:TextStyle(
+                        fontWeight: FontWeight.w600, 
+                        fontSize: 18,
+                        color: Colors.black
+                      )))),
+                      SizedBox(height:30),
                   isloading == true ? Container(child:CircularProgressIndicator(backgroundColor: Colors.greenAccent,)) : Container(
                     width: MediaQuery.of(context).size.width*0.4,
                     padding: EdgeInsets.only(top: 3, left: 3),

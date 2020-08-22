@@ -1,4 +1,5 @@
 import 'package:AdminBoldAlive/models/ProductProvider.dart';
+import 'package:AdminBoldAlive/screens/hidden/hidden.dart';
 import 'package:AdminBoldAlive/screens/home/products.dart';
 import 'package:AdminBoldAlive/screens/login/notauth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,7 +39,8 @@ class MyApp extends StatelessWidget {
             Welcome.routeName : (ctx) => Welcome(),
             LoginScreen.routeName : (ctx) => LoginScreen(),
             Products.routeName : (ctx) => Products(),
-            AddProduct.routeName : (ctx) => AddProduct()
+            AddProduct.routeName : (ctx) => AddProduct(),
+            Hidden.routeName : (ctx) => Hidden()
             // CartScreen.routeName : (ctx) => CartScreen(),
             // OrderPage.routeName : (ctx) => OrderPage(),
             // EditScreen.routeName :(ctx) => EditScreen(),
